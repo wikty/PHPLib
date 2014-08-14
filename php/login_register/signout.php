@@ -1,6 +1,7 @@
 <?php
 include('config.php');
-include(APP_INC_DIR.'authenicate.inc.php');
+//include(APP_INC_DIR.'authenicate.inc.php');
+include(APP_INC_DIR.'authenicate_encrypt.inc.php');
 
 $fields = array('submit'=>'logout');
 
