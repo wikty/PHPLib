@@ -1,6 +1,7 @@
 <?php
 include('config.php');
-include(APP_INC_DIR.'authenicate.inc.php');
+//include(APP_INC_DIR.'authenicate.inc.php');
+include(APP_INC_DIR.'authenicate_encrypt.inc.php');
 
 if(is_authenicated(APP_AUTHENICATE_KEY))
 {
@@ -61,6 +62,11 @@ if(isset($_POST[$fields['submit']]))
                 }
                 else
                 {
+                    // encrypt password
+                    require_once(APP_INC_DIR.'slat_encrypt.class.inc.php');
+                    $my_encrypt=new SlatEncrypt($password);
+                    $password=$my_encrypt->getEncryptedData();
+
                     if(!user_save($username, $password))
                     {
                         $error[]='there is something wrong with our site , please try later.';   
