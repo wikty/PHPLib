@@ -1,6 +1,7 @@
 <?php
 include('config.php');
-include(APP_INC_DIR . 'authenicate.inc.php');
+//include(APP_INC_DIR.'authenicate.inc.php');
+include(APP_INC_DIR.'authenicate_encrypt.inc.php');
 
 if(!is_authenicated(APP_AUTHENICATE_KEY))
 {
@@ -10,6 +11,10 @@ if(!is_authenicated(APP_AUTHENICATE_KEY))
 }
 else
 {
+	// flush session time for authenicated user
+	require_once(APP_INC_DIR.'flush_session.inc.php');
+	flush_session();
+
 	// home content
 	// if signed in, show following content
 	echo "welcome to our website's Home Page, Mr." . $_SESSION['username'];
