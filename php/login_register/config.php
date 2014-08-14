@@ -5,7 +5,7 @@ define('APP_ROOT_DIR',
 	join(DIRECTORY_SEPARATOR, array(dirname($_SERVER['SCRIPT_FILENAME']))));
 
 define('APP_ROOT_URL', 
-	join('', array('http://'
+	join('', array('http://',
 					$_SERVER['SERVER_NAME'], 
 					':', 
 					$_SERVER['SERVER_PORT'], 
@@ -41,3 +41,7 @@ define('APP_SIGNUP_URL',
 					'signup.php')));
 
 define('APP_AUTHENICATE_KEY', 'authenicated');
+
+define('APP_SESSION_TIME_KEY', 'last_request_time');
+
+define('APP_SESSION_TIMEOUT', 60*3); // timeout 3 mintues session break
