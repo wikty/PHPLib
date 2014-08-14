@@ -1,4 +1,5 @@
 <?php
+// APP_DATA_DIR is defined by app directory root config.php
 define("USERDATAPATH", APP_DATA_DIR.'usersdata.txt');
 
 function fetch_users($dataPath=USERDATAPATH)
