@@ -1,4 +1,14 @@
 <?php
+
+// function _encrypt_function($original_data, $encrypted_data)
+// {
+// 	if($original_data==$encrypted_data)
+// 	{
+// 		return true;
+// 	}
+// 	return false;
+// }
+
 //$users like: array(array('username'=>'xiao','password'=>'jk93l'), array()...)
 function authenicate($users, $username, $password)
 {
