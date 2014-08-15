@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+<head>
+<title>Bouncy Sprite</title>
+<style type="text/css">
+.draw-target{
+float:left;
+position:relative;
+background-color:#ccf;
+width:480px;
+height:320px;
+margin:10px;
+}
+</style>
+<script type="text/javascript">
+            	// IE6 background image caching fix.
+            	// Include this JavaScript a the top of your page.
+            	try {
+            		document.execCommand("BackgroundImageCache", false, true);
+            	} catch (e) { }
+</script>
+<script type="text/javascript" src="jquery-1.6.1.min.js">
+</script>
+<script type="text/javascript">
+	var timeInfo = function(goalFPS) {
+		var FPS = 0, paused = true, totalFPS = 0, oldTime = 0, totalCoeff = 0, counter = 0;
+		return ({
+			getInfo: function() {
+				if (paused === true) {
+					paused = false;
+					oldTime = +new Date();
+					return {
+						elapsed: 0,
+						FPS: 0,
+						avgFPS: 0,
+						coeff: 0,
+						avgCoeff: 0
+					};
+				}
+				var newTime = +new Date();
+				var elapsed = newTime - oldTime;
+				oldTime = newTime;
+				var FPS = 1000 / elapsed;
+				totalFPS += FPS;
+				var coeff = goalFPS / FPS;
+				totalCoeff += coeff;
+				counter++;
+				return {
+					elapsed: elapsed,
+					FPS: FPS,
+					avgFPS: totalFPS / counter,
+					coeff: coeff,
+					avgCoeff: totalCoeff / counter
+				};
+			},
+			pasue: function() {
+				paused = true;
+			}
+		});
+	};
+</script>
+<script type="text/javascript">
+	; (function($) {
+		$.fn.bouncyPlugin = function(pluginOptions) {
+			var SimpleSprite = function(options) {
+				var imageWidth = options.imageWidth;
+				var imagePath = options.imagePath;
+				var spriteWidth = options.spriteWidth;
+				var spriteHeight = options.spriteHeight;
+				var drawTarget = options.drawTarget;
+				drawTarget.style.position = 'relative';
+				var elem = document.createElement('div');
+				var elemStyle = elem.style;
+				elemStyle.position = 'absolute';
+				elemStyle.width = spriteWidth + 'px';
+				elemStyle.height = spriteHeight + 'px';
+				//dont default show index(0) sprite,define -imageWidth show nothing
+				//and you can also adjust repeat mode
+				elemStyle.background = 'url(' + options.imagePath + ') no-repeat ' + (-imageWidth) + 'px 0px';
+				drawTarget.appendChild(elem);
+				var that = {
+					draw: function(x, y) {
+						elemStyle.left = x + 'px';
+						elemStyle.top = y + 'px';
+					},
+					quickSprite: function(index) {
+						var vertOffset = -Math.floor((index * spriteWidth) / imageWidth) * spriteHeight;
+						var horizOffset = -((index * spriteWidth) % imageWidth);
+						elemStyle.backgroundPosition = horizOffset + 'px ' + vertOffset + 'px';
+					},
+					fadeIn: function(interval) {
+						//default interval=40,fade in will use 2 seconds
+						if (elemStyle.display == 'none' || elemStyle.visibility == 'hidden') {
+							var opacity = 0;
+							if (typeof elemStyle.opacity == 'string') {
+								elemStyle.opacity = 0;
+							}
+							else if (typeof elemStyle.filter == 'string') {
+								elemStyle.filter = 'alpha(opacity=' + 0 + ')';
+							}
+							else {
+								throw new Error('SimpleSprite::fadeIn 1'); //indicate usage is wrong
+							}
+							elemStyle.display = 'block';
+							elemStyle.visibility = 'visible';
+							//notice NaN can not use ==,should isNaN
+							interval = (isNaN(parseInt(interval, 10))) ? 40 : parseInt(interval, 10);
+							var htime = setInterval(function() {
+								if (opacity <= 1) {
+									opacity += 0.02;
+									if (typeof elemStyle.opacity == 'string') {
+										elemStyle.opacity = opacity;
+									}
+									else if (typeof elemStyle.filter == 'string') {
+										elemStyle.filter = 'alpha(opacity=' + opacity * 100 + ')';
+									}
+									else {
+										throw new Error('SimpleSprite::fadeIn 1'); //indicate usage is wrong
+									}
+								}
+								else {
+									clearInterval(htime);
+								}
+							}, interval);
+						}
+					},
+					fadeOut: function(interval) {
+						//default interval=40,fade in will use 2 second
+						if (elemStyle.display != 'none' && elemStyle.visibility != 'hidden') {
+							var opacity = 1;
+							interval = (isNaN(parseInt(interval, 10))) ? 40 : parseInt(interval, 10);
+							var htime = setInterval(function() {
+								if (opacity >= 0) {
+									opacity -= 0.02;
+									if (typeof elemStyle.opacity == 'string') {
+										elemStyle.opacity = opacity;
+									}
+									else if (typeof elemStyle.filter == 'string') {
+										elemStyle.filter = 'alpha(opacity=' + opacity * 100 + ')';
+									}
+									else {
+										throw new Error('SimpleSprite::fadeOut 1');
+									}
+								}
+								else {
+									clearInterval(htime);
+									elemStyle.display = 'none';
+								}
+							}, interval);
+						}
+					},
+					show: function() {
+						elemStyle.display = 'block';
+						elemStyle.visibility = 'visible';
+					},
+					hide: function() {
+						//elemStyle.visibility = 'hidden';
+						elemStyle.display = 'none';
+					},
+					detachSprite: function() {
+						drawTarget.removeChild(elem);
+					},
+					attachSprite: function() {
+						drawTarget.appendChild(elem);
+					}
+				};
+				return that;
+			};
+			var BouncySprite = function(params) {
+				var x = params.x,
+					y = params.y,
+					vX = params.vX,
+					vY = params.vY,
+					maxX = params.maxX,
+					maxY = params.maxY;
+				var spriteIndex = 0;
+				var that = new SimpleSprite(params);
+				that.move = function(coeff) {
+					x += vX * coeff;
+					y += vY * coeff;
+					spriteIndex += ((vX > 0) ? 1 * coeff : -1 * coeff);
+					spriteIndex %= 5;
+					spriteIndex = spriteIndex >> 0;
+					if (spriteIndex < 0) spriteIndex = 4;
+					if ((x < 0 && vX < 0) || (x > maxX && vX > 0)) {
+						vX = -vX;
+					}
+					if ((y < 0 && vY < 0) || (y > maxY && vY > 0)) {
+						vY = -vY;
+					}
+					that.quickSprite(spriteIndex);
+					that.draw(x, y);
+				}
+				return that;
+			};
+			var ManagerBouncy = function(drawTarget, bouncyNum) {
+				var tmInfo = timeInfo(40);
+				var sprites = [];
+				var targetWidth;
+				var targetHeight;
+				if (drawTarget.currentStyle) {
+					targetWidth = drawTarget.currentStyle.width;
+					targetHeight = drawTarget.currentStyle.height;
+				}
+				else {
+					targetWidth = window.getComputedStyle(drawTarget).width;
+					targetHeight = window.getComputedStyle(drawTarget).height;
+				}
+				targetWidth = targetWidth.slice(0, -2);
+				targetHeight = targetHeight.slice(0, -2);
+				for (var i = 0; i < bouncyNum; i++) {
+					sprites.push(BouncySprite({
+						imagePath: 'cogs.png',
+						imageWidth: 256,
+						spriteWidth: 64,
+						spriteHeight: 64,
+						drawTarget: drawTarget,
+						x: (targetWidth - 64) * Math.random(),
+						y: (targetHeight - 64) * Math.random(),
+						maxX: targetWidth - 64,
+						maxY: targetHeight - 64,
+						vX: Math.random() * 4 - 2,
+						vY: Math.random() * 4 - 2
+					}));
+				}
+				var htime;
+				var that = {
+					moveAll: function() {
+						var timeData = tmInfo.getInfo();
+						for (var i = 0; i < bouncyNum; i++) {
+							sprites[i].move(timeData.coeff);
+						}
+						htime = setTimeout(that.moveAll, 20);
+					},
+					stop: function() {
+						clearTimeout(htime);
+					}
+				};
+				return that;
+			}
+			pluginOptions = $.extend({}, $.fn.bouncyPlugin.defaults, pluginOptions);
+			return this.each(function() {
+				$(this).css('background-color', pluginOptions.bgColor);
+				var manager = ManagerBouncy(this, pluginOptions.bouncyNum);
+				manager.moveAll();
+			});
+		};
+		$.fn.bouncyPlugin.defaults = {
+			bgColor: '#ccf',
+			bouncyNum: 20
+		};
+	})(jQuery);
+</script>
+<script type="text/javascript">
+	window.onload = function() {
+		$('.draw-target').bouncyPlugin({bgColor:'#8ff',bouncyNum:15});
+	}
+</script>
+</head>
+<body>
+	<div class="draw-target">
+	
+	</div>
+		<div class="draw-target">
+	
+	</div>
+		<div class="draw-target">
+	
+	</div>
+		<div class="draw-target">
+	
+	</div>
+</body>
+</html>

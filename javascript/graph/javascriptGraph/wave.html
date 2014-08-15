@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+MyTest
+</title>
+<style type="text/css">
+#draw-target{
+width:480px;
+height:320px;
+background-color:#000;
+position:relative;
+}
+
+</style>
+<script type="text/javascript">
+	window.onload = function() {
+		var drawTarget = document.getElementById('draw-target');
+		var bars = [], divs;
+		var div;
+		var x = 0;
+		var canvasWidth = 480; //px
+		var canvasHeight = 320; //px
+		var waveWidth = 60; //px
+		var waveHeight = 80; //px
+		var waveFrequency = 0.2; //five seconds will one wave
+		var waveInitAng = Math.PI / 6;
+		var barWidth = 1; //px
+		var barHeight = 20; //px
+		var barNum = canvasWidth / barWidth;
+		var barAng = (barWidth / waveWidth) * Math.PI * 2;
+		var timeStep = 50; //50 msecond for render frequency
+		var angStep = ((timeStep * waveFrequency) / 1000) * Math.PI * 2;
+		var baseLine = 20 + waveHeight; //wave's baseline(top coodr)
+		divs = document.createDocumentFragment();
+		for (i = 0; i < barNum; i += barWidth) {
+			div = document.createElement('div');
+			div.style = "position:absolute; width:" + barWidth + "px; height:" + barHeight + "px;background-color:#0d0; top:0px; left:" + i + "px;"
+			divs.appendChild(div);
+			bars.push(div);
+		}
+		drawTarget.appendChild(divs);
+		setInterval(function() {
+			drawWave();
+			waveInitAng += angStep;
+			if (waveInitAng > Math.PI * 2) {
+				waveInitAng -= Math.PI * 2;
+			}
+		}, timeStep);
+		function drawWave() {
+			for (var i = 0; i < barNum; i++) {
+				bars[i].style.top = parseInt(baseLine + Math.sin(waveInitAng + i * barAng) * waveHeight) + 'px';
+			}
+		}
+	}
+</script>
+</head>
+<body>
+	<div id="draw-target">
+	
+	</div>
+</body>
+</html>

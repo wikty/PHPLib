@@ -1,0 +1,176 @@
+<!doctype html>
+<html>
+<head>
+<title>Test</title>
+<style type="text/css">
+*{
+
+}
+.carousel{
+position:absolute;
+width:100%;
+height:100%;
+left:0px;
+top:0px;
+margin:0;
+padding:0;
+}
+</style>
+<script type="text/javascript" src="jquery-1.6.1.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+
+		// Function to execute a callback when an image has been loaded,
+		// either from the network, or from the browser cache.
+
+		function loadImage($image, src, callback) {
+
+			// Bind the load event BEFORE setting the src.
+			$image.bind("load", function(evt) {
+				// If no valid width, image hasn't actually loaded.
+				//				if ($image.width() === 0) {
+				//					$image.bind('load', arguments.callee);
+				//					return;
+				//				}
+				// Image has loaded, so unbind event and call callback.
+				$image.unbind("load");
+				callback($image);
+			}).each(function() {
+				// For Gecko based browsers, check the complete property,
+				// and trigger the event manually if image loaded.
+				if ($image[0].complete) {
+					$image.trigger("load");
+				}
+			});
+			// For Webkit browsers, the following line ensures load event fires if
+			// image src is the same as last image src. This is done by setting
+			// the src to an empty string initially.
+			if ($.browser.webkit) {
+				$image.attr('src', '');
+			}
+			$image.attr('src', src);
+		};
+
+		var createItem = function($image, angle, options) {
+			var origWidth;
+			var origHeight;
+			var scaleRange = 1 - options.minScale;
+			var $wrapper;
+			var loaded = false;
+			$image.css({ position: 'absolute', opacity: 0 });
+			$wrapper = $image.wrap('<div style="position:absolute;"></div>').parent();
+			var that = {
+				update: function(ang) {
+					ang += angle;
+					var scale = ((Math.sin(ang) + 1) / 2) * scaleRange + options.minScale;
+					var x = Math.cos(ang) * options.radiusX + options.width / 2;
+					var y = Math.sin(ang) * options.radiusY + options.height / 2; //should scale????
+					$wrapper.css({
+						top: (y >> 0) + 'px',
+						left: (x >> 0) + 'px',
+						zIndex: (scale * 100) >> 0
+					});
+					if (loaded) {
+						$image.css({
+							width: (origWidth * scale) + 'px',
+							height: (origHeight * scale) + 'px',
+							left: ((-origWidth * scale) / 2) + 'px',
+							top: ((-origHeight * scale) / 2) + 'px'
+						});
+					}
+				}
+			};
+			loadImage($image, $image.attr('src'), function() {
+				origWidth = $image.width();
+				origHeight = $image.height();
+				$image.animate({
+					opacity: 1
+				}, 1000);
+				loaded = true;
+			});
+			return that;
+		};
+
+		var createCarousel = function($wrap, options) {
+			var items = [];
+			var $images = $('img', $wrap);
+			var len = $images.length;
+			var angInterval = (options.frameRate / options.rotRate) * Math.PI * 2;
+			var rotAng = 0;
+			var angle = Math.PI / 2;
+			var spacing = (Math.PI * 2) / len;
+			var paused = false;
+			var waitTime;
+			$wrap.bind('mouseover mouseout', function(evt) {
+				if (!$(evt.target).is('img')) {
+					return;
+				}
+				if (evt.type === 'mouseover') {
+					clearTimeout(waitTime);
+					paused = true;
+				}
+				else {//mouseout
+					waitTime = setTimeout(function() {
+						paused = false;
+					}, 200);
+				}
+			});
+			for (var i = 0; i < len; i++) {
+				items[i] = createItem($($images[i]), angle, options);
+				angle += spacing;
+			}
+			setInterval(function() {
+				if (!paused) {
+					rotAng += angInterval;
+					if (rotAng > Math.PI * 2) {
+						rotAng -= Math.PI * 2;
+					}
+				}
+				for (var i = 0; i < len; i++) {
+					items[i].update(rotAng);
+				}
+			}, options.frameRate);
+		}
+		$.fn.Carousel = function(options) {
+			this.each(function() {
+				options = $.extend({}, $.fn.Carousel.defaults, options);
+				$(this).css({
+					position: 'relative',
+					width: options.width + 'px',
+					height: options.height + 'px'
+				});
+				createCarousel($(this), options);
+			});
+		}
+		$.fn.Carousel.defaults = {
+			width: 521,
+			height: 300,
+			radiusX: 230,
+			radiusY: 80,
+			frameRate: 50,
+			rotRate: 6000,
+			minScale: 0.6
+		};
+		$('.carousel').Carousel({
+		width:800,
+		height:600,
+		radiusX:350,
+		radiusY:100
+		});
+	});
+</script>
+</head>
+<body>
+<div class="carousel" ><!-- This is the wrapping element -->
+    <img src="pic1.png" alt="Pic 1"/>
+    <img id="pic2" src="pic2.png" alt="Pic 2"/>
+    <img src="pic3.png" alt="Pic 3"/>
+    <img src="pic4.png" alt="Pic 4"/>
+    <img src="pic5.png" alt="Pic 5"/>
+    <img src="pic6.png" alt="Pic 6"/>
+    <img src="pic7.png" alt="Pic 7"/>
+    <img src="pic8.png" alt="Pic 8"/>
+    <img src="pic9.png" alt="Pic 9"/>
+</div>
+</body>
+</html>

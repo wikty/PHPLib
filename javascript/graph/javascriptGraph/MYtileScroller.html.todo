@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+<title>Test</title>
+<style type="text/css">
+body{
+margin:0;
+padding:0;
+}
+#viewports{
+width:100%;
+height:100%;
+position:absolute;
+background-color:#3090c7;
+}
+</style>
+<script src="jquery-1.6.1.min.js">
+
+</script>
+<script type="text/javascript">
+	jQuery(function($) {
+		$(document).ready(function() {
+			var viewScroller = function(params) {
+				var $viewport = params.$viewport;
+				var viewportWidth = $viewport.innerWidth();
+				var viewportHeight = $viewport.innerHeight();
+				var imagePath = params.imagePath;
+				var imageWidth = params.imageWidth;
+				var imageHeight = params.imageHeight;
+				var tileWidth = params.tileWidth;
+				var tileHeight = params.tileHeight;
+				var mapWidth = params.mapWidth;
+				var mapHeight = params.mapHeight;
+				var map = params.map;
+				var posTiles = [];
+				var styleTiles = [];
+				//console.log(viewportWidth);
+				//console.log(viewportHeight);
+				///console.log(tileWidth);
+				//console.log(tileHeight);
+				var tileColNum = Math.floor(viewportWidth / tileWidth) + 1;
+				var tileRowNum = Math.floor(viewportHeight / tileHeight) + 1;
+				//console.log(tileColNum);
+				//console.log(tileRowNum);
+				var tileTotal = tileColNum * tileRowNum;
+				var mapWidthPixels = params.mapWidth * tileWidth;
+				var mapHeightPixels = params.mapHeight * tileHeight;
+				var html = '<div class="handle" style="position:absolute;">';
+				for (var r = 0; r < tileRowNum; r++)
+					for (var c = 0; c < tileColNum; c++) {
+					html += '<div class="tile" style="position:absolute;background:url(' +
+								imagePath + ') no-repeat 0px 0px;width:' +
+								tileWidth + 'px;' + 'height:' +
+								tileHeight + 'px;' + 'top:' +
+								r * tileHeight + 'px;' + 'left:' +
+								c * tileWidth + 'px;"></div>';
+				}
+				html += '</div>';
+				//console.log(html);
+				$viewport.append(html);
+				var handle = $('.handle', $viewport)[0];
+				var tiles = $('.tile', $viewport);
+				for (var i = 0; i < tileTotal; i++) {
+					styleTiles.push(tiles[i].style);
+				}
+				for (var top = 0; top < imageHeight; top += tileHeight)
+					for (var left = 0; left < imageWidth; left += tileWidth) {
+					posTiles.push(-left + 'px ' + (-top) + 'px');
+				}
+				var that = {
+					mapWidthPiexls: mapWidthPixels,
+					mapHeightPiexls: mapHeightPixels,
+					draw: function(viewportX, viewportY) {
+						if (params.wrapX) {
+							viewportX %= mapWidthPixels;
+							if (viewportX < 0) viewportX += mapWidthPixels;
+						}
+						if (params.wrapY) {
+							viewportY %= mapHeightPixels;
+							if (viewportY < 0) viewportY += mapHeightPixels;
+						}
+						var handleMoveX = -(viewportX % tileWidth);
+						var handleMoveY = -(viewportY % tileHeight);
+						var viewStartX = (viewportX / tileWidth) >> 0;
+						var viewStartY = (viewportY / tileHeight) >> 0;
+						handle.style.left = handleMoveX + 'px';
+						handle.style.top = handleMoveY + 'px';
+						for (r = 0; r < tileRowNum; r++)
+							for (c = 0; c < tileColNum; c++) {
+								if (map[(r + viewStartY) * mapWidth + c + viewStartX] != 0) {
+								styleTiles[r * tileRowNum + c].backgroundPosition = posTiles[map[(r + viewStartY) * mapWidth + c + viewStartX]];
+								//console.log(tiles[r * tileRowNum + c].backgroundPosition);
+							}
+							//console.log(map[(r + viewStartY) * mapWidth + c + viewStartX]);
+							//console.log(posTiles[map[(r + viewStartY) * mapWidth + c + viewStartX]]);
+						}
+					}
+				};
+				return that;
+			}
+
+			var loadMap = function($viewports, xmlMap, callback) {
+				var viewScrolls = [];
+				$.ajax({
+					type: 'GET',
+					url: xmlMap,
+					dataType: 'xml',
+					success: function(xml) {
+						var imageInfo = $(xml).find('image');
+						var mapInfo = $(xml).find('map');
+						$(xml).find('layer').each(function() {
+							var params = {
+								imagePath: imageInfo.attr('source'),
+								imageWidth: +imageInfo.attr('width'),
+								imageHeight: +imageInfo.attr('height'),
+								mapWidth: +mapInfo.attr('width'),
+								mapHeight: +mapInfo.attr('height'),
+								tileWidth: +mapInfo.attr('tilewidth'),
+								tileHeight: +mapInfo.attr('tileheight'),
+								wrapX: true,
+								wrapY: true
+							};
+							//console.log($(this).find('map'));
+							var mapData = $(this).find('data').text().split(',');
+							var len = mapData.length;
+							params.map = [];
+							for (var i = 0; i < len; i++) {
+								params.map.push(+mapData[i]);
+							}
+							//console.log(params.map);
+							var $viewport = $('<div>').attr({
+								'id': $(this).attr('name')
+							}).css({
+								'width': '100%',
+								'height': '100%',
+								'position': 'absolute',
+								'overflow': 'hidden'
+							});
+							$viewports.append($viewport);
+							params.$viewport = $viewport;
+							viewScrolls.push(viewScroller(params));
+						});
+						callback(viewScrolls);
+					}
+				});
+			}
+
+			loadMap($('#viewports'), 'map1.tmx', function(viewScrollers) {
+				var ctrl1 = viewScrollers[0];
+				var ctrl2 = viewScrollers[1];
+				var ctrl3 = viewScrollers[2];
+				var speedX = 0, speedY = 0;
+				var viewportX = 0;
+				var viewportY = 0;
+				$('#viewports').mousemove(function(e) {
+					speedX = e.clientX - $('#viewports').innerWidth();
+					speedX /= $('#viewports').innerWidth() / 2;
+					speedX *= 10;
+					speedY = e.clientY - $('#viewports').innerHeight();
+					speedY /= $('#viewports').innerHeight() / 2;
+					speedY *= 10;
+				});
+				setInterval(function() {
+					ctrl1.draw(viewportX, viewportY);
+					ctrl2.draw(viewportX / 2, viewportY / 2);
+					ctrl3.draw(viewportX / 3, viewportY / 3);
+					viewportX += speedX;
+					viewportY += speedY;
+				}, 33);
+			});
+		});
+	});
+</script>
+</head>
+<body>
+<div id='viewports'>
+
+</div>
+</body>
+</html>
