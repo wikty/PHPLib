@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			function randomArray(data, length, max){
+				length = length || 20;
+
+				max = max || 100;
+				for(var i=0; i<length; i++){
+					data.push(Math.floor(Math.random()*max));
+				}
+				return data;
+			}
+			var dataSet = [];
+			randomArray(dataSet);
+			//console.log(dataSet);
+			// for(var i=0; i<20; i++){
+			// 	var num = Math.floor(Math.random()*50);
+			// 	dataSet.push(num);
+			// }
+			var w = 500;
+			var h = 100;
+			var padding = 20;
+			var textHeight = 11;
+			var svg = d3.select('body')
+						.append('svg')
+						.attr('width', w)
+						.attr('height', h);
+			var scaleX = d3.scale
+						   .ordinal()
+						   .domain(d3.range(dataSet.length))
+						   .rangeRoundBands([padding, w - padding], 0.05);
+			var scaleY = d3.scale
+						   .linear()
+						   .domain([Math.min.apply(Math, dataSet), Math.max.apply(Math, dataSet)])
+						   .range([padding, h-padding]);
+			var scaleC = d3.scale
+						   .linear()
+						   .domain([Math.min.apply(Math, dataSet), Math.max.apply(Math, dataSet)])
+						   .range([255, 0]);
+			svg.selectAll('rect')
+			   .data(dataSet)
+			   .enter()
+			   .append('rect')
+			   .attr('x', function(d, i){
+			   		return scaleX(i);
+			   })
+			   .attr('y', function(d){
+			   		return h - scaleY(d);
+			   })
+			   .attr('width', scaleX.rangeBand())
+			   .attr('height', function(d){
+			   		return scaleY(d);
+			   })
+			   .attr('fill', function(d){
+			   		return 'rgb(0, 0, ' + Math.floor(scaleC(d)) + ')';
+			   });
+			 svg.selectAll('text')
+			 	.data(dataSet)
+			 	.enter()
+			 	.append('text')
+			 	.attr({
+			 		x: function(d, i){
+			 			return scaleX(i) + Math.floor(scaleX.rangeBand()/2);
+			 		},
+			 		y: function(d, i){
+			 			return (h - scaleY(d)) + textHeight;
+			 		},
+			 		"font-family": 'sans-serif',
+			 		"font-size": '' + textHeight + 'px',
+			 		fill: 'white',
+			 		"text-anchor": 'middle'
+			 	})
+			 	.text(function(d){
+			 	 	return d;
+			 	});
+			 d3.select('#trigger').on('click', function(){
+				dataSet = [];
+				randomArray(dataSet);
+				// randomArray(dataSet, 20, 200);
+				// scaleY = d3.scale
+				// 		   .linear()
+				// 		   .domain([Math.min.apply(Math, dataSet), Math.max.apply(Math, dataSet)])
+				// 		   .range([padding, h-padding]);
+				d3.selectAll('rect')
+				  .data(dataSet)
+				  .transition()
+				  .delay(function(d, i){// delay(1000) is ok
+				  	return (i/dataSet.length)*1000;
+				  })
+				  .duration(500) // default 250
+				  .ease('linear') // default cubic-in-out
+				  .attr({
+				  	y: function(d){
+				  		return h -scaleY(d);
+				  	},
+				  	height: function(d){
+				  		return scaleY(d);
+				  	},
+				  	fill: function(d){
+				  		return 'rgb(0, 0, ' + Math.floor(scaleC(d)) + ')';
+				  	}
+				  });
+				d3.selectAll('text')
+			 	  .data(dataSet)
+			 	  .attr({
+			 	   	x: function(d, i){
+			 			return scaleX(i) + Math.floor(scaleX.rangeBand()/2);
+			 		},
+			 		y: function(d, i){
+			 			return (h - scaleY(d)) + textHeight;
+			 		},
+			 		"font-family": 'sans-serif',
+			 		"font-size": '' + textHeight + 'px',
+			 		fill: 'white',
+			 		"text-anchor": 'middle'
+			 	  })
+			 	  .text(function(d){
+			 	   	return d;
+			 	  });
+			 });
+		}
+	</script>
+	<button type="button" id="trigger">Click</button>
+</body>
+</html>

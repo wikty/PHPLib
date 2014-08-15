@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			var h = 300;
+			var w = 300;
+			var outerRadius = w/2;
+			//var innerRadius = 30;
+			var innerRadius = 0;
+			var dataSet = [20, 12, 6, 3, 45, 21, 4];
+			//convert tool, convert original data to draw data
+			var pie = d3.layout.pie();
+			//color scale
+			var color = d3.scale.category10();
+			//generate arc data use to <path d=arc>
+			var arc = d3.svg
+						.arc()
+						.innerRadius(innerRadius)
+						.outerRadius(outerRadius);
+
+			var svg = d3.select('body')
+						.append('svg')
+						.attr({
+							width: w,
+							height: h
+						});
+			//some g.arc for hold:<path> and <text>
+			var arcs = svg.selectAll('g.arc')
+							.data(pie(dataSet))
+							.enter()
+							.append('g')
+							.attr('class', 'arc')
+							//move g from top-left to svg center
+							.attr('transform', 'translate(' + outerRadius + ',' + outerRadius+')');
+			arcs.append('path')
+				.attr('fill', function(d, i){
+					//color scale, i => 10 color
+					return color(i);
+				})
+				.attr('d', arc);
+			arcs.append('text')
+				.attr({
+					transform: function(d){
+						return 'translate(' + arc.centroid(d) + ')';
+					},
+					'text-anchor': 'middle',
+				})
+				.text(function(d){
+					//the pie data object.value => original data
+					return d.value;
+				});
+		}
+	</script>
+</body>
+</html>

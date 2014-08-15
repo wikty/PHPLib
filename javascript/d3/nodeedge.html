@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			var dataSet = {
+				nodes: [//can be any format data in this array
+					{ name: "Adam" },
+					{ name: "Bob" },
+					{ name: "Carrie" },
+					{ name: "Donovan" },
+					{ name: "Edward" },
+					{ name: "Felicity" },
+					{ name: "George" },
+					{ name: "Hannah" },
+					{ name: "Iris" },
+					{ name: "Jerry" }
+				],
+				edges: [
+					{ source: 0, target: 1 },
+					{ source: 0, target: 2 },
+					{ source: 0, target: 3 },
+					{ source: 0, target: 4 },
+					{ source: 1, target: 5 },
+					{ source: 2, target: 5 },
+					{ source: 2, target: 5 },
+					{ source: 3, target: 4 },
+					{ source: 5, target: 8 },
+					{ source: 5, target: 9 },
+					{ source: 6, target: 7 },
+					{ source: 7, target: 8 },
+					{ source: 8, target: 9 }
+				]
+			};
+
+			var w = 500;
+			var h = 300;
+			var force = d3.layout
+							.force()
+							.nodes(dataSet.nodes) //dataSet.nodes  be changed
+						//[{index:0, name:'Adam', px: 186, py: 121, weight: 4, x: 186, y: 120}]
+							.links(dataSet.edges) //dataSet.edges be changed
+						//[{source:nodeobject, target: nodeobject}]
+							.size([w, h])
+							.linkDistance([50]) //not required
+							.charge([-100]) // not required
+							.start();
+			force.on('tick', function(){
+				edges.attr({
+					x1: function(d){ return d.source.x; },
+					y1: function(d){ return d.source.y; },
+					x2: function(d){ return d.target.x; },
+					y2: function(d){ return d.target.y; }
+				});
+				nodes.attr({
+					cx: function(d){ return d.x; },
+					cy: function(d){ return d.y; }
+				})
+			});
+
+			var scaleC = d3.scale.category10();
+			var svg = d3.select('body')
+						.append('svg')
+						.attr({
+							width: w,
+							height: h
+						});
+			var nodes = svg.selectAll('circle')
+							.data(dataSet.nodes)
+							.enter()
+							.append('circle')
+							.attr('r', function(d){
+								return d.weight + 10;
+							})
+							.attr('fill', function(d, i){
+								return scaleC(i);
+							})
+							.call(force.drag);
+			var edges = svg.selectAll('line')
+							.data(dataSet.edges)
+							.enter()
+							.append('line')
+							.attr('stroke', '#ccc')
+							.attr('stroke-width', function(d){
+								return (d.source.weight + d.target.weight)/3;
+							});
+
+		}
+	</script>
+</body>
+</html>

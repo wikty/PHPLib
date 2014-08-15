@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<style type="text/css">
+	rect:hover{
+		fill: orange;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-ms-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	svg text{
+		pointer-events: none;
+	}
+	</style>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			function randomDict(data, length, max){
+				length = length || 20;
+
+				max = max || 100;
+				for(var i=0; i<length; i++){
+					data.push({mykey:i ,
+							   myvalue: Math.floor(Math.random()*max)});
+				}
+				return data;
+			}
+			var dataSet = [];
+			randomDict(dataSet);
+			var w = 500;
+			var h = 100;
+			var padding = 20;
+			var textHeight = 11;
+			var svg = d3.select('body')
+						.append('svg')
+						.attr('width', w)
+						.attr('height', h);
+			function sortByWho(d){
+				return d.myvalue;
+			}
+			function itsKey(d){
+				return d.mykey;
+			}
+			var scaleX = d3.scale
+						   .ordinal()
+						   .domain(d3.range(dataSet.length))
+						   .rangeRoundBands([padding, w - padding], 0.05);
+			var scaleY = d3.scale
+						   .linear()
+						   .domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)])
+						   .range([padding, h-padding]);
+			var scaleC = d3.scale
+						   .linear()
+						   .domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)])
+						   .range([255, 0]);
+			var sortOrder = true;
+			function sortAllBars(){
+				sortOrder = !sortOrder;
+				svg.selectAll('rect')
+				   .sort(function(a, b){
+				   		if(sortOrder){
+				   			return d3.descending(a.myvalue, b.myvalue);
+				   		}
+				   		else{
+				   			return d3.ascending(a.myvalue, b.myvalue);
+				   		}
+				   })
+				   .transition()
+				   .duration(function(d, i){
+				   		return (i/dataSet.length)*1000;
+				   })
+				   .attr('x', function(d, i){
+						return scaleX(i);	   		
+				   });
+				 // svg.selectAll('text')
+				 //    .sort(function(a, b){
+				 //   		if(sortOrder){
+				 //   			return d3.descending(a.myvalue, b.myvalue);
+				 //   		}
+				 //   		else{
+				 //   			return d3.ascending(a.myvalue, b.myvalue);
+				 //   		}
+				 //   })
+				 //   .transition()
+				 //   .duration(function(d, i){
+				 //   		return (i/dataSet.length)*1000;
+				 //   })
+				 //   .attr('x', function(d, i){
+				 //   	    return scaleX(i);
+				 //   });
+			}
+			svg.selectAll('rect')
+			   .data(dataSet, itsKey)
+			   .enter()
+			   .append('rect')
+			   .attr('x', function(d, i){
+			   		return scaleX(i);
+			   })
+			   .attr('y', function(d){
+			   		return h - scaleY(d.myvalue);
+			   })
+			   .attr('width', scaleX.rangeBand())
+			   .attr('height', function(d){
+			   		return scaleY(d.myvalue);
+			   })
+			   .attr('fill', function(d){
+			   		return 'rgb(0, 0, ' + Math.floor(scaleC(d.myvalue)) + ')';
+			   })
+			   .append('title')
+			   .text(function(d){
+			   		return 'Height is ' + d.myvalue;
+			   });
+
+
+			 d3.select('#changetrigger').on('click', function(){
+				dataSet = [];
+				randomDict(dataSet);
+				d3.selectAll('rect')
+				  .data(dataSet, itsKey)
+				  .transition()
+				  .delay(function(d, i){// delay(1000) is ok
+				  	return (i/dataSet.length)*1000;
+				  })
+				  .duration(500) // default 250
+				  .ease('linear') // default cubic-in-out
+				  .attr({
+				  	y: function(d){
+				  		return h -scaleY(d.myvalue);
+				  	},
+				  	height: function(d){
+				  		return scaleY(d.myvalue);
+				  	},
+				  	fill: function(d){
+				  		return 'rgb(0, 0, ' + Math.floor(scaleC(d.myvalue)) + ')';
+				  	}
+				  });
+			 });
+			
+			d3.select('#addtrigger').on('click', function(){
+				//add data item
+				var num = Math.floor(Math.random()*100);
+				var key = dataSet[dataSet.length-1]['mykey'] + 1;
+				dataSet.push({mykey: key, myvalue:num});
+				//update scale
+				scaleX.domain(d3.range(dataSet.length));
+				scaleY.domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)]);
+				scaleC.domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)]);
+				//add element
+				svg.selectAll('rect')
+					 .data(dataSet, itsKey)
+					 .enter()
+					 .append('rect')
+				     .attr('x', w);
+				//show the add element
+				svg.selectAll('rect')
+				  .data(dataSet, itsKey)
+				  .transition()
+				  .duration(1000)
+			      .attr({
+				 	  x: function(d, i){
+				 		return scaleX(i);
+				 	  },
+				 	  y: function(d){
+				 	  	return h - scaleY(d.myvalue);
+				 	  },
+				 	  width: scaleX.rangeBand(),
+				 	  height: function(d){
+				 	  	return scaleY(d.myvalue);
+				 	  },
+				 	  fill: function(d){
+				 	  	return 'rgb(0, 0, ' + Math.floor(scaleC(d.myvalue)) + ')';
+				 	  }
+				   });
+			});
+
+			d3.select('#removetrigger').on('click', function(){
+				//remove first data item
+				dataSet.shift();
+				//update scale
+				scaleX.domain(d3.range(dataSet.length));
+				scaleY.domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)]);
+				scaleC.domain([d3.min(dataSet, sortByWho), d3.max(dataSet, sortByWho)]);
+				//remove first element
+				svg.selectAll('rect')
+				   .data(dataSet, itsKey)
+				   .exit()
+				   .transition()
+				   .duration(1000)
+				   .attr('x', -scaleX.rangeBand())
+				   .remove();
+			});
+			d3.select('#sorttrigger').on('click', function(){
+				sortAllBars();
+			});
+		}
+	</script>
+	<button type="button" id="changetrigger">change</button>
+	<button type="button" id="addtrigger">Add</button>
+	<button type="button" id="removetrigger">Remove</button>
+	<button type="button" id="sorttrigger">Sort</button>
+</body>
+</html>

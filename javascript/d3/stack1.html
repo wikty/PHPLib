@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			// function Row2Column(data){
+			// 	var len = data.length;
+			// 	var temp = [];
+			// 	for(var i=0; i<len; i++){
+			// 		var item = data[i];
+			// 		var j = 0;
+			// 		for(var attr in item)if(item.hasOwnProperty(attr)){
+			// 			if(typeof temp[j] == 'undefined'){
+			// 				temp[j] = [];
+			// 			}
+			// 			var obj = {};
+			// 			obj['x'] = i;
+			// 			obj['y'] = item[attr];
+			// 			temp[j].push(obj);
+			// 			j++;
+			// 		}
+			// 		j = 0;
+			// 	}
+			// 	return temp;
+			// }
+			// var dataSet = [
+			// 	{orange: 5, apple: 7, grape: 10},
+			// 	{orange: 2, apple: 9, grape: 3},
+			// 	{orange: 4, apple: 2, grape: 2},
+			//	{orange: 3, apple: 9, grape: 9}
+			//	{orange: 30, apple: 19, grape: 39}
+			// ];
+			// dataSet = Row2Column(dataSet);
+			var dataSet =[
+				[
+					{x: 0, y: 5},
+					{x: 1, y: 9},
+					{x: 2, y: 8},
+					{x: 3, y: 15},
+					{x: 4, y: 2}
+				],
+				[
+					{x: 0, y: 4},
+					{x: 1, y: 2},
+					{x: 2, y: 45},
+					{x: 3, y: 30},
+					{x: 4, y: 9}
+				],
+				[
+					{x: 0, y: 15},
+					{x: 1, y: 3},
+					{x: 2, y: 18},
+					{x: 3, y: 5},
+					{x: 4, y: 12}
+				]
+			];
+			var h = 400;
+			var w = 600;
+			var padding = 0;
+			var svg = d3.select('body')
+						.append('svg')
+						.attr({
+							width: w,
+							height: h
+						});
+			var stack = d3.layout.stack();
+			stack(dataSet);
+			var scaleX = d3.scale
+							.ordinal()
+							.domain(d3.range(dataSet[0].length))
+							.rangeRoundBands([padding, w-padding], 0.05);
+			var scaleY = d3.scale
+							.linear()
+							.domain([0 ,d3.max(dataSet, function(d){
+								return d3.max(d, function(d){
+									return d.y0 + d.y;
+								});
+							})])
+							.range([padding, h-padding]);
+			var scaleC = d3.scale.category10();
+
+			var groups = svg.selectAll('g')
+							.data(dataSet)
+							.enter()
+							.append('g')
+							.attr('fill', function(d, i){
+								return scaleC(i);
+							});
+			var rects = groups.selectAll('rect')
+								.data(function(d){ return d; })
+								.enter()
+								.append('rect')
+								.attr('x', function(d, i){
+									return scaleX(i);
+								})
+								.attr('y', function(d, i){
+									return h - scaleY(d.y0) - scaleY(d.y); // previous values sum
+								})
+								.attr('height', function(d, i){
+									return scaleY(d.y); // current value
+								})
+								.attr('width', function(d, i){
+									return scaleX.rangeBand();
+								});
+
+		}
+	</script>
+</body>
+</html>

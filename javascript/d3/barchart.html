@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Data Drive Document</title>
+	<style type="text/css">
+	rect:hover{
+		fill: orange;
+		-moz-transition: all 0.3s;
+		-o-transition: all 0.3s;
+		-ms-transition: all 0.3s;
+		-webkit-transition: all 0.3s;
+		transition: all 0.3s;
+	}
+	svg text{
+		/*make text element
+		can not capture mouse events
+		*/
+		pointer-events: none;
+	}
+	</style>
+	<script type="text/javascript" src="d3.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		window.onload=function(){
+			var dataSet = [];
+			for(var i=0; i<20; i++){
+				var num = Math.floor(Math.random()*50);
+				dataSet.push(num);
+			}
+			var w = 500;
+			var h = 100;
+			var columnPadding = 1;
+			var scale = 2;
+			var textHeight = 11;
+			var svg = d3.select('body')
+						.append('svg')
+						.attr('width', w)
+						.attr('height', h);
+			svg.selectAll('rect')
+			   .data(dataSet)
+			   .enter()
+			   .append('rect')
+			   .attr('x', function(d, i){
+			   		return i*(w/dataSet.length);
+			   })
+			   .attr('y', function(d){
+			   		return h - d*scale;
+			   })
+			   .attr('width', (w/dataSet.length)-columnPadding)
+			   .attr('height', function(d){
+			   		return d*scale;
+			   })
+			   .attr('fill', function(d){
+			   		return 'rgb(0, 0, ' + (d*10)%255 + ')';
+			   }).
+			   on('click', function(d, i){
+			   		console.log(i,d);
+			   });
+			 svg.selectAll('text')
+			 	.data(dataSet)
+			 	.enter()
+			 	.append('text')
+			 	.attr({
+			 		x: function(d, i){
+			 			return i*(w/dataSet.length) + (w/dataSet.length - columnPadding)/2;
+			 		},
+			 		y: function(d, i){
+			 			return h - d*scale + textHeight;
+			 		},
+			 		"font-family": 'sans-serif',
+			 		"font-size": '' + textHeight + 'px',
+			 		fill: 'white',
+			 		"text-anchor": 'middle'
+			 	})
+			 	.text(function(d){
+			 	 	return d;
+			 	});
+		}
+	</script>
+</body>
+</html>
