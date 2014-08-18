@@ -1,0 +1,55 @@
+<html>
+<head>
+<title></title>
+<script type="text/javascript">
+
+    xmlhttp = null;
+
+    if (window.XMLHttpRequest) {
+        // code for Firefox, Opera, IE7, etc.
+        xmlhttp = new XMLHttpRequest();
+    }
+    else if (window.ActiveXObject) {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    function ajaxresult(url) {
+        if (xmlhttp != null) {
+            xmlhttp.onreadystatechange = state_change;
+            xmlhttp.open("GET", url, true);
+            xmlhttp.send(null);
+        }
+        else {
+            alert("Your browser does not support XMLHTTP.");
+        }
+    }
+    function gotit(data) {
+        var myarray = data.split(",");
+        var text = myarray[0];
+        document.getElementById("here").innerHTML = myarray[1];
+    }
+    function state_change() {
+        if (xmlhttp.readyState == 4 || xmlhttp.readyState == "complete") {
+            // 4 = "loaded"
+            if (xmlhttp.status == 200) {
+                // 200 = "OK"
+                gotit(xmlhttp.responseText);
+            }
+            else {
+                xmlhttp.abort();
+            }
+        }
+    }
+    function myproc(data) {
+        ajaxresult("search.php?id=" + data);
+    }
+
+</script>
+
+</head>
+<body>
+<input type="button" value="19" onclick="myproc(this.value)" />
+<div id="here"></div>
+</body>
+</html>
