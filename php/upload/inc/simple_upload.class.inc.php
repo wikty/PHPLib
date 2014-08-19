@@ -190,6 +190,7 @@ class SimpleUpload
                             $this->_messages[]=sprintf($this->_translate['_processFileUpload-r'][$this->_language],
                                                       $file['name'], $filename);
                         }
+                        return $filename;
                     }
                     else
                     {
@@ -316,6 +317,7 @@ class SimpleUpload
 
     public function move()
     {
+        $results=array();
         // if upload multiple file
         // $_FILES['name'] is an array
         $file=current($this->_uploadedFiles);
@@ -323,8 +325,8 @@ class SimpleUpload
         {
             foreach($file['name'] as $index=>$filename)
             {
-                $this->_processFileUpload(array(
-                    'name'=>$filename,
+                $results[]=$this->_processFileUpload(array(
+                    'name'=>$file['name'][$index],
                     'type'=>$file['type'][$index],
                     'size'=>$file['size'][$index],
                     'error'=>$file['error'][$index],
@@ -334,14 +336,15 @@ class SimpleUpload
         }
         else
         {
-            $this->_processFileUpload(array(
-                'name'=>$filename,
+            $results[]=$this->_processFileUpload(array(
+                'name'=>$file['name'],
                 'type'=>$file['type'],
                 'size'=>$file['size'],
                 'error'=>$file['error'],
                 'tmp_name'=>$file['tmp_name']
             ));
         }
+        return $results;
     }
 
 
