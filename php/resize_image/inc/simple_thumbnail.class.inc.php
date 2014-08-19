@@ -19,7 +19,7 @@ class SimpleThumbnail
     protected $_imageType='';
     protected $_suffix='_thb';
     protected $_imageName='';
-    protected $_canProcess=false;
+    protected $_canProcess=true;
     protected $_messages=array();
     protected $_imageMimeTypes=array('image/jpeg','image/jpg','image/gif','image/png');
 
@@ -151,7 +151,8 @@ class SimpleThumbnail
             $this->_destinationDir=$path;
             return true;
         }
-        
+
+        $this->_canProcess=false;
         $this->_messages[]="Destination directory $path is invalid or cannot writable.";
         return false;
     }
@@ -186,6 +187,8 @@ class SimpleThumbnail
         {
             $this->_messages[]="The image file $imagePath cannot be opened.";
         }
+
+        $this->_canProcess=false;
         return false;
 	}
 
@@ -197,7 +200,7 @@ class SimpleThumbnail
             return true;
         }
 
-        $this->_messages[]="$size is not a validated number,so max size is default $this->_maxSize";
+        $this->_messages[]="$size is an invalid number.(MaxSize keep original value)";
         return false;
     }
 
@@ -212,6 +215,8 @@ class SimpleThumbnail
             $this->_suffix=$suffix;
             return true;
         }
+
+        $this->_messages[]="$suffix only can contains aplnum.(Suffix keep original value)";
         return false;
     }
 
@@ -223,12 +228,12 @@ class SimpleThumbnail
 
     public function create($tbWidth='',$tbHeight='')
     {
-        if(!empty($this->_messages))
+		if($this->_canProcess===false)
         {
             return false;
         }
 
-		$width=$this->_originalWidth;
+        $width=$this->_originalWidth;
 		$height=$this->_originalHeight;
 		if(!empty($tbWidth) && !empty($tbHeight))
 		{
@@ -241,6 +246,7 @@ class SimpleThumbnail
         // }
 
         $this->_createThumbnail($width, $height);
+        $this->_canProcess=true;
         return $this->_thumbName;
     }
 
