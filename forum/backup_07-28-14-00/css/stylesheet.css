@@ -1,0 +1,168 @@
+body{
+font-family:Verdana,sans-serif;
+font-size:12px;
+line-height:1.3em;
+color:#333;
+background:#fff;
+margin:0;
+padding:0;
+text-align:center;
+width:100%;
+}
+#header{
+position:absolute;
+top:0px;
+left:0px;
+height:60px;
+width:100%;
+background:#555;
+padding-top:8px;
+}
+#header h1{
+color:#fff;
+letter-spacing:0.3em;
+font-size:30px;
+text-transform:uppercase;
+}
+#menu{
+font-family:Verdana,sans-serif;
+font-size:14px;
+font-weight:bold;
+position:absolute;
+top:60px;
+left:0px;
+height:27px;
+width:100%;
+padding:0px;
+color:#000;
+background:#eee;
+}
+#menu a:link{
+text-decoration:none;
+color:#000;
+}
+#menu a:visited{
+text-decoration:none;
+border-bottom:dotted 1px #369;
+color:#000;
+}
+#menu a:hover,#menu a:focus{
+text-decoration:none;
+border-bottom:solid 1px #036;
+color:#000;
+}
+#container{
+position:absolute;
+top:85px;
+left:0px;
+background:#fff;
+margin:0 auto 0 auto;
+text-align:left;
+width:100%;
+height:100%;
+}
+#container>#bar{
+float:left;
+width:200px;
+background:#eee;
+padding:10px;
+margin-right:30px;
+height:100%;
+}
+#container>#bar>img{
+border:none;
+}
+#container>#bar>h1{
+font-size:12px;
+text-transform:uppercase;
+letter-spacing:0.3em;
+}
+#container>#bar>ul{
+list-style:none;
+}
+#main{
+margin:15px 15px 15px 240px;
+padding:15px 15px 15px 15px;
+background:#fff;
+height:100%;
+}
+#footer{
+position:relative;
+left:auto;
+right:auto;
+bottom:-250px;
+font-weight:bold;
+color:#000;
+text-align:center;
+}
+.italic{
+font-style:italic;
+}
+#main>.additional{
+text-indent:3em;
+}
+#main>.myform{
+width:75%;
+text-align:left;
+}
+#main>.commentheader{
+color:#999;
+}
+.error{
+color:Red;
+}
+table{
+border:1px solid #ccc;
+background:#fff;
+margin:10px;
+}
+th{
+letter-spacing:0.3em;
+background:#eee;
+color:#000;
+text-transform:uppercase;
+text-align:center;
+border-top:1.5px solid #eee;
+border-bottom:1px solid #ccc;
+}
+tr.head{
+letter-spacing:0.3em;
+background:#ddd;
+color:#000;
+text-transform:uppercase;
+border-top:1.5px solid #eee;
+border-bottom:1px solid #ccc;
+}
+tr.body{
+background:#fff;
+color:#000;
+}
+td{
+border:1px solid #ccc;
+padding:10px;
+}
+.nowhere{
+background:#0ff;
+}
+.maintable{
+width:25%;
+float:left;
+}
+.innerframe{
+position:relative;
+top:20px;
+left:50px;
+}
+.postman,.followman{
+width:65%;
+}
+.postman caption{
+color:Red;
+}
+.followman caption{
+color:Green;
+}
+.notice{
+font-size:2em;
+color:#ff0000;
+}

@@ -1,0 +1,19 @@
+<?php
+require_once'config/mysite.cfg.php';
+if(!$_SESSION)
+{
+    session_start();
+}
+if(!isset($_SESSION['authenicated']))
+{
+    if(isset($_GET[sess_timeout]))
+    {
+        header("Location:$cfg_siteloginpage?timeout=true");
+    }
+    else
+    {
+        header("Location:$cfg_siteloginpage");
+    }
+    exit;
+}
+?>

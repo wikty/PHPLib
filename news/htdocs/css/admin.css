@@ -1,0 +1,234 @@
+body {
+	color:#000;
+	background-color: #fff;
+	font-family:Arial, Helvetica, sans-serif;
+	text-align:center;
+    width:100%;
+    margin:0px;
+    padding:0px;
+}
+#main .myform label {
+	font-weight: bold;
+	display:block;
+	text-transform:capitalize;
+}
+.error {
+	color:#f00;
+	font-weight:bold;
+}
+#main .myform .error{
+font-size:80%;
+}
+#main .myform{
+width:100%;
+height:99%;
+margin:0 auto;
+padding-top:1%;
+padding-bottom:0px;
+}
+#main .myform .prompt{
+margin-top:0px;
+margin-bottom:20px;
+font-size:80%;
+}
+#main .myform .frame{
+margin-top:0px;
+margin-bottom:0px;
+height:100%;
+}
+#main .myform .frame .basic{
+width:80%;
+margin:1%;
+padding-bottom:1%;    
+}
+#main .myform .frame .personal{
+width:80%;
+margin:2%; 
+padding-top:1%;
+}
+#main .myform .frame .basic input{
+width:90%;
+height:auto;
+}
+#main .myform .frame .basic input:focus{
+background:#fefeef;
+}
+.myform .frame .personal input{
+width:90%;
+height:auto;
+}
+#main .myform .frame .personal input:focus{
+background:#fefeef;
+}
+
+#header{
+position:absolute;
+top:0px;
+left:0px;
+width:100%;
+background:#444;
+}
+#header h1{
+color:#fff;
+letter-spacing:0.3em;
+font-size:2em;
+text-transform:uppercase;
+text-align:center;
+}
+
+#menu{
+font-weight:bold;
+font-style:italic;
+font-size:100%;
+position:absolute;
+left:0px;
+top:4em;
+height:1.5em;
+width:100%;
+padding:0px;
+color:#000;
+background:#eee;
+margin-bottom:0px;
+}
+#menu ul
+{
+    list-style-type:none;
+    font-size:80%;
+    font-weight:bold;
+    margin:0px;
+    padding:0px;
+}
+#menu ul li{
+display:inline-block;
+padding:0px;
+margin:0px;
+margin-right:20px;
+}
+#menu ul li a{
+padding:0px;
+margin:0px;
+}
+#menu a:link{
+text-decoration:none;
+color:#000;
+}
+#menu a:visited{
+text-decoration:none;
+border-bottom:dotted 1px #369;
+color:#000;
+}
+#menu a:hover,#menu a:focus{
+text-decoration:none;
+border-bottom:solid 1px #036;
+color:#000;
+}
+
+#container{
+position:absolute;
+top:5.5em;
+left:0px;
+background:#fff;
+margin:0 auto;
+padding:0px;
+text-align:left;
+width:100%;
+height:auto;
+min-height:100%;
+}
+#container #bar{
+position:absolute;
+top:0;
+left:0;
+width:20%;
+background:#efe;
+padding:1%;
+height:100%;
+}
+#container #bar img{
+border:none;
+}
+#container #bar h2{
+font-size:1em;
+font-weight:bold;
+text-transform:uppercase;
+}
+#container #bar ul{
+list-style-type:circle;
+color:#101;
+}
+#container #bar ul li a:link{
+	text-decoration:none;
+}
+#container #bar ul li a:hover{
+	text-decoration:underline;
+}
+#container #bar ul li a:focus{
+	text-decoration:underline;
+}
+#container #main{
+margin:0;
+padding:0;
+background:#fff;
+height:auto;
+width:50%;
+margin-left:24%;
+}
+#container #main .show img{
+width:400px;
+height:300px;
+}
+#container #main .show .title{
+font-size:1.5em;
+text-transform:capitalize;
+color:#cccc33;
+}
+#container #rbar{
+position:absolute;
+right:0px;
+top:0px;
+width:12%;
+background:#fefeee;
+padding:1%;
+margin:0;
+margin-left:1%;
+height:100%;
+}
+#container #rbar img{
+border:none;
+float:left;
+}
+#contianer #rbar .desc{
+font-weight:bold;
+}
+#footer{
+position:absolute;
+width:100%;
+top:100%;
+left:auto;
+right:auto;
+height:auto;
+font-weight:bold;
+color:#000;
+text-align:center;
+padding-top:0;
+margin-top:0;
+background:#ffeffe;
+}
+td{
+border:1px solid #ccc;
+padding:10px;
+}
+.notice{
+font-size:2em;
+color:#ff0000;
+}
+.italic{
+font-style:italic;
+}
+table{
+border-collapse:collapse;
+}
+#product-list tr td img{
+width:400px;
+height:300px;
+}
